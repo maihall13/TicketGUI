@@ -2,8 +2,6 @@ package com.company;
 
 import java.io.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -70,8 +68,6 @@ public class TicketManager {
                     System.out.println("File created successfully.");
                 } catch (Exception e) {
                 }
-
-
                 break;
             }
             else {
@@ -83,6 +79,10 @@ public class TicketManager {
     }
 
 
+
+    /*
+    METHOD FOR SEARCHING BY DESCRIPTION CALLED BY SEARCHBYISSUE METHOD
+     */
     protected LinkedList<Ticket> searchDescription(String searchString) {
 
         LinkedList<Ticket> searchList = new LinkedList<Ticket>();//Linked list that will be returend
@@ -97,6 +97,9 @@ public class TicketManager {
     }
 
 
+    /*
+    METHOD FOR SEARCHING BY ISSUE
+    */
     protected void searchByIssue() {
         // Ask user for search term
         String search = Input.getStringInput("Enter the issue you would like to search.");
@@ -106,6 +109,9 @@ public class TicketManager {
     }
 
 
+    /*
+    METHOD FOR DELETING TICKET BY THE ISSUE
+    */
     protected void deleteTicketByIssue() {
         searchByIssue();
 
@@ -140,6 +146,9 @@ public class TicketManager {
     }
 
 
+    /*
+    METHOD FOR DELETING TICKET BY THE ID NUMBER
+     */
     protected void deleteTicketById() {
 
         printAllTickets();   //display list for user
@@ -170,13 +179,6 @@ public class TicketManager {
 
                 ticketQueue.remove(ticket);
                 System.out.println(String.format("Ticket %d deleted", deleteID));
-
-
-
-
-
-
-
                 break; //don't need the loop any more.
             }
         }

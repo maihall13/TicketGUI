@@ -34,6 +34,7 @@ public class PreviousTickets extends TicketManager{
 
         //send to create a new ticket and then returns that ticket.
         Ticket t = new Ticket(description, priority, reporter, dateReported);
+        t.ticketID = id;
         return t;
     }
 }
