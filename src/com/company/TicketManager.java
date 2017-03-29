@@ -1,18 +1,26 @@
 package com.company;
 
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.ListIterator;
+
+import static com.company.Input.getStringInput;
 
 public class TicketManager {
 
     LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
+    LinkedList<Ticket> resolvedTickets = new LinkedList<Ticket>();
 
     private void mainMenu() {
 
         while (true) {
 
             //TODO problem 4 - add two new options: Delete by Issue and Search by Issue
-            System.out.println("1. Enter Ticket\n2. Delete Ticket by ID\n3. Display All Tickets\n4. Quit");
+            System.out.println("1. Enter Ticket\n2. Search by Issue\n3. Delete Ticket by ID\n4. Delete Ticket by Issue\n5. Display All Tickets\n6. Quit");
 
             int task = Input.getPositiveIntInput("Enter your selection");
 
@@ -20,14 +28,50 @@ public class TicketManager {
                 addTickets();
             }
             else if (task == 2) {
-                deleteTicketById();
+                searchByIssue();
             }
             else if (task == 3) {
+                deleteTicketById();
+            }
+            else if (task == 4){
+                deleteTicketByIssue();
+            }
+            else if(task == 5){
                 printAllTickets();
             }
-            else if ( task == 4 ) {
+            else if ( task == 6 ) {
                 System.out.println("Quitting program");
                 // TODO Problem 7 save all open tickets, and today's resolved tickets, to a file
+
+                String resolvedTicketsFile = "Resolved_tickets_as_of_february_14_2014.txt";
+                try {
+                    FileWriter resolved = new FileWriter(resolvedTicketsFile);
+                    BufferedWriter resolvedFile = new BufferedWriter(resolved);
+                    ListIterator itr = resolvedTickets.listIterator();
+                    while (itr.hasNext()) {
+                        Ticket element = (Ticket) itr.next();
+                        resolvedFile.write(element + "\n");
+                    }
+                    resolvedFile.close();
+                    System.out.println("File created successfully.");
+                } catch (Exception e) {
+                }
+
+                String openTicketFile = "open_tickets.txt";
+                try {
+                    FileWriter open = new FileWriter(openTicketFile);
+                    BufferedWriter openFile = new BufferedWriter(open);
+                    ListIterator itr = ticketQueue.listIterator();
+                    while (itr.hasNext()) {
+                        Ticket element = (Ticket) itr.next();
+                        openFile.write(element + "\n");
+                    }
+                    openFile.close();
+                    System.out.println("File created successfully.");
+                } catch (Exception e) {
+                }
+
+
                 break;
             }
             else {
@@ -40,30 +84,59 @@ public class TicketManager {
 
 
     protected LinkedList<Ticket> searchDescription(String searchString) {
-        // TODO problem 3: complete this method - it should return a
-        // list of the tickets that contain the searchString in the description.
-        // Return an empty list if there are no matching Tickets.
-        // The search should be case-insensitive
 
-        return null;  //replace this with a return statement that returns a list
+        LinkedList<Ticket> searchList = new LinkedList<Ticket>();//Linked list that will be returend
+
+        // list of the tickets that contain the searchString in the description.
+        for (Ticket ticket : ticketQueue) {
+            if (ticket.getDescription().contains(searchString)){
+                searchList.add(ticket);
+            }
+        }
+        return searchList;//Return statement that returns a list
     }
 
 
     protected void searchByIssue() {
-        // TODO problem 4 implement this method. Return a list of matching tickets.
-
         // Ask user for search term
-        // Use searchDescription() method to get list of matching Tickets
-        // display list
+        String search = Input.getStringInput("Enter the issue you would like to search.");
+        for (Ticket x : searchDescription(search)){
+            System.out.println(x);
+        }
     }
 
 
     protected void deleteTicketByIssue() {
-        // TODO problem 5 implement this method
-        // Ask user for string to search for
-        // Use searchDescription to create list of matching Tickets
-        // Ask for ID of ticket to delete
-        // Delete that ticket
+        searchByIssue();
+
+        //Slightly redundant but for revision make a delete and resolve method
+
+        int deleteID = Input.getPositiveIntInput("Enter ID of ticket to delete");
+        boolean found = false;
+        for (Ticket ticket : ticketQueue) {
+            if (ticket.getTicketID() == deleteID) {
+                found = true;
+                //Remove call from head of queue and resolve
+
+                System.out.println("ticket id:" + ticket.getTicketID());
+                Ticket resolvedTicket = ticket;    //Remove call from head of queue
+                String resolution = Input.getStringInput("Enter resolution for " + resolvedTicket);
+                resolvedTicket.setResolution(resolution);
+                resolvedTicket.setResolvedDate(new Date());  //default resolved date is now
+                resolvedTickets.add(ticket);
+                ticketQueue.remove(ticket);
+                System.out.println(String.format("Ticket %d deleted", deleteID));
+
+
+                break; //don't need the loop any more.
+            }
+        }
+        if (!found) {
+            System.out.println("Ticket ID not found, no ticket deleted");
+            //Use recursive
+            deleteTicketById();
+        }
+        printAllTickets();  //print updated list
     }
 
 
@@ -83,15 +156,36 @@ public class TicketManager {
         for (Ticket ticket : ticketQueue) {
             if (ticket.getTicketID() == deleteID) {
                 found = true;
+                //Remove call from head of queue and resolve
+
+
+                System.out.println("ticket id:" + ticket.getTicketID());
+
+                Ticket resolvedTicket = ticket;    //Remove call from head of queue
+                String resolution = Input.getStringInput("Enter resolution for " + resolvedTicket);
+                resolvedTicket.setResolution(resolution);
+
+                resolvedTicket.setResolvedDate(new Date());  //default resolved date is now
+                resolvedTickets.add(ticket);
+
                 ticketQueue.remove(ticket);
                 System.out.println(String.format("Ticket %d deleted", deleteID));
+
+
+
+
+
+
+
                 break; //don't need the loop any more.
             }
         }
         if (!found) {
             System.out.println("Ticket ID not found, no ticket deleted");
-            //TODO Problem 2 re-write this method to ask for ID again if not found
+            //Use recursive
+            deleteTicketById();
         }
+
         printAllTickets();  //print updated list
 
     }
@@ -103,17 +197,16 @@ public class TicketManager {
 
             Date dateReported = new Date(); //Default constructor creates Date with current date/time
 
-            String description = Input.getStringInput("Enter problem");
-            String reporter = Input.getStringInput("Who reported this issue?");
+            String description = getStringInput("Enter problem");
+            String reporter = getStringInput("Who reported this issue?");
             int priority = Input.getPositiveIntInput("Enter priority of " + description);
 
             Ticket t = new Ticket(description, priority, reporter, dateReported);
-            //ticketQueue.add(t);
             addTicketInPriorityOrder(t);
 
             printAllTickets();
 
-            String more = Input.getStringInput("More tickets to add? Enter N for no, anything else to add more tickets");
+            String more = getStringInput("More tickets to add? Enter N for no, anything else to add more tickets");
 
             if (more.equalsIgnoreCase("N")) {
                 return;
@@ -164,15 +257,21 @@ public class TicketManager {
 
     /* Main is hiding down here. Create a TicketManager object, and call the mainMenu method.
     Avoids having to make all of the methods in this class static. */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ParseException {
         TicketManager manager = new TicketManager();
 
-        //TODO problem 8 load open tickets from a file
+        //creates new class to "override" or high public method in order to call it
+        //from static main
+        PreviousTickets load = new PreviousTickets();
 
-        //TODO Problem 9 how will you know what ticket ID to start with?
-
+        BufferedReader br = new BufferedReader(new FileReader("open_tickets.txt"));
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            //returns ticket and adds ticket to the que
+            //Order numbers will change but the order of the priority stay the same.
+            manager.ticketQueue.add(load.loadTickets(line));
+        }
         manager.mainMenu();
     }
-
 }
 

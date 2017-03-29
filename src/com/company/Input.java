@@ -23,6 +23,7 @@ public class Input {
         if (question != null) {
             System.out.println(question);
         }
+
         while (true) {
             try {
                 String stringInput = scanner.nextLine();
@@ -33,7 +34,7 @@ public class Input {
                     System.out.println("Please enter a positive number");
                 }
             } catch (NumberFormatException fne) {
-                System.out.println("Please type a positive number");
+                System.out.println("Please enter a number format not a string.");
             }
         }
     }
