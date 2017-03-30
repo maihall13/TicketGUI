@@ -10,8 +10,7 @@ public class Ticket {
     private Date dateReported;
     private Date resolvedDate;
     protected String resolution;
-
-    //TODO Problem 1: explain the role of ticketIdCounter and ticketID
+    private boolean isResolved;
 
     //STATIC Counter - one variable, shared by all Ticket objects.
     //If any Ticket object modifies this counter, all Ticket objects will have the modified value
@@ -21,7 +20,6 @@ public class Ticket {
     //The ID for each ticket - an instance variable. Each Ticket will have it's own ticketID variable
     protected int ticketID;
 
-    // TODO problem 6: tickets need to store the resolution date and a string describing the resolution
     // Either add them to this class or create another class called ResolvedTicket - which
     // do you think is the better approach?
 
@@ -42,7 +40,7 @@ public class Ticket {
         this.resolution = resolution;
     }
 
-    public String getResolution(){return resolution;}
+    //public String getResolution(){return resolution;}
 
     protected int getPriority() {
         return priority;
@@ -54,9 +52,20 @@ public class Ticket {
         return ticketID;
     }
 
+    public void setIsResolved(boolean resolvedTrueOrFalse){this.isResolved = resolvedTrueOrFalse;}
+
+
     public String toString(){
-        return("ID: " + this.ticketID + " Issue: " + this.description + " Priority: " + this.priority + " Reported_by: "
-                + this.reporter + " Reported_on: " + this.dateReported);
+
+        if (isResolved == true){
+            return("ID: " + this.ticketID + " Issue: " + this.description + " Priority: " + this.priority + " Reported_by: "
+                    + this.reporter + " Reported_on: " + this.dateReported + " Resolution: " + this.resolution + " Resolved_on: " + this.resolvedDate);
+        }
+        else{
+            return("ID: " + this.ticketID + " Issue: " + this.description + " Priority: " + this.priority + " Reported_by: "
+                    + this.reporter + " Reported_on: " + this.dateReported);
+        }
+
     }
 }
 
