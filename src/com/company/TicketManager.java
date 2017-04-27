@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import com.company.TicketForm;
 
 import static com.company.Input.getStringInput;
 
@@ -178,7 +179,10 @@ public class TicketManager {
             String description = getStringInput("Enter problem");
             String reporter = getStringInput("Who reported this issue?");
             int priority = Input.getPositiveIntInput("Enter priority of " + description);
+
             Ticket t = new Ticket(description, priority, reporter, dateReported);
+
+
             addTicketInPriorityOrder(t);
             printAllTickets();
             String more = getStringInput("More tickets to add? Enter N for no, anything else to add more tickets");
@@ -233,17 +237,31 @@ public class TicketManager {
      this class static.
     ********************************************************************************/
     public static void main(String[] args) throws IOException, ParseException {
+
+        TicketForm gui = new TicketForm();
+
         TicketManager manager = new TicketManager();
         //creates new class to "override" or high public method in order to call it
         //from static main
-        PreviousTickets load = new PreviousTickets();
-        BufferedReader br = new BufferedReader(new FileReader("open_tickets.txt"));
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            //returns ticket and adds ticket to the que
-            //Order numbers will change but the order of the priority stay the same.
-            manager.ticketQueue.add(load.loadTickets(line)); }
-        manager.mainMenu();
+
+        File file = new File("open_tickets");
+        boolean exists = file.exists();
+
+            if (file.exists() && file.isFile()) {
+                PreviousTickets load = new PreviousTickets();
+                BufferedReader br = new BufferedReader(new FileReader("open_tickets.txt"));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    //returns ticket and adds ticket to the que
+                    //Order numbers will change but the order of the priority stay the same.
+                    manager.ticketQueue.add(load.loadTickets(line));
+                }
+            manager.mainMenu();
+        }
+        else
+        {
+            manager.mainMenu();
+        }
     }
 }
 
